@@ -11,6 +11,14 @@ function abc() {
 	text("Papa's Smoothie-Land", 0, 0);
 }
 
+function endScren() {
+	textSize(32);
+	textAlign(CENTER, CENTER);
+	background("white")
+	fill("pink");
+	text("Congratulations! This is the end :)", 0, 0);
+}
+
 // world.gravity.y = 10;
 
 // let ball = new Sprite();
