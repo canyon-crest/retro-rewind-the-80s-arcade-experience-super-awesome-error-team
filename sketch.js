@@ -15,23 +15,71 @@ function abc() {
 
 function playScreen() {
 	document.getElementById("body").removeEventListener("click", (playScreen));
-world.gravity.y = 10;
+// world.gravity.y = 10;
 
 let ball = new Sprite();
 ball.diameter = 50;
 ball.img = '🤯';
+ball.physics = DYNAMIC;
+
+function collideX(){
+	ball.vel.x = 0;
+}
+
+function collideY(){
+	ball.vel.y = 0;
+}
+
+addEventListener("keydown", function(draw){
+	if (kb.pressing('left')) {
+		ball.vel.x = -5;
+		ball.vel.y = 0;
+		return;
+	}
+
+	else if (kb.pressing('right')) {
+		ball.vel.x = 5;
+		ball.vel.y = 0;
+		return;
+	} 
+
+	else if (kb.pressing('up')) {
+		ball.vel.x = 0;
+		ball.vel.y = -5;
+		return;
+	} 
+	else if (kb.pressing('down')) {
+		ball.vel.x = 0;
+		ball.vel.y = 5;
+		return;
+	} 
+	else {
+		ball.vel.x = 0;
+		ball.vel.y = 0;
+		return;
+	}
+})
+
 
 let groundA = new Sprite();
-groundA.x = -120;
+groundA.x = -520;
 groundA.width = 220;
-groundA.rotation = 30;
-groundA.physics = KIN;
-groundA.velocity.y = -1;
+groundA.height = 10;
+groundA.rotation = 90;
+groundA.physics = STATIC;
+q5.update = function() {
+	clear();
+	if (ball.collides(groundA)){
+		collideX();
+		console.log('hit');
+	}
+}
 
 let groundB = new Sprite();
-groundB.x = 120;
+groundB.x = 520;
 groundB.width = 220;
-groundB.rotation = -30;
+groundB.height = 10;
+groundB.rotation = 90;
 groundB.physics = STATIC;
 
 q5.update = function () {
