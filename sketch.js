@@ -10,12 +10,11 @@ function abc() {
 	fill("pink");
 	text("Papa's Smoothie-Land", 0, -25);
 	text("Click anywhere to begin", 0, 25);
-	if (mouseIsPressed) {
-		playScreen();
-	};
+	document.getElementById("body").addEventListener("click", (playScreen));
 };
 
 function playScreen() {
+	document.getElementById("body").removeEventListener("click", (playScreen));
 world.gravity.y = 10;
 
 let ball = new Sprite();
@@ -26,7 +25,8 @@ let groundA = new Sprite();
 groundA.x = -120;
 groundA.width = 220;
 groundA.rotation = 30;
-groundA.physics = STATIC;
+groundA.physics = KIN;
+groundA.velocity.y = -1;
 
 let groundB = new Sprite();
 groundB.x = 120;
