@@ -1,34 +1,80 @@
 await Canvas();
 var screen = "start"
 let gameOver = false;
+let congratulations = false;
 let walls;
 let player, evilGuy, duck;
 let grapefruitGreenTea, matchaDrink, mangoDrink, passionFruitDrink, watermelonSmoothie, milkTea, peachOolong;
 let ingredients = new Group();
 
+let bgImage;
+bgImage = loadImage('images/background2.png');
+
+let backgroundMusic = loadSound('sounds/backgroundMusic.mp3');
+backgroundMusic.volume = 0.3;
+let collectSound = loadSound('sounds/collect.mp3');
+collectSound.volume = 0.4;
+let deathSound = loadSound('sounds/quack.mp3');
+deathSound.volume = 0.4;
+let victoryMusic = loadSound('sounds/Milkshake.mp3')
+victoryMusic.volume = 0.3;
+
+let setupFunctions = {
+        "watermelon": watermelonSetup,
+        "mango": mangoSetup,
+        "peach": peachSetup,
+        "milk": milkSetup,
+        "grapefruit": grapeFruitSetup,
+        "passion": passionSetup,
+        "oolong": oolongSetup,
+        "matcha": matchaSetup,
+        "black": blackSetup,
+        "green": greenSetup
+    }
+
+    let drinkDisplayMap = {
+        "Grapefruit Green Tea": ggtDrinkSetup,
+        "Matcha Tea": mDrinkSetup,
+        "Mango Grapefruit Green Tea": mangoDrinkSetup,
+        "Passion Fruit Green Tea": passionFruitDrinkSetup,
+        "Watermelon Smoothie": watermelonSmoothieSetup,
+        "Milk Tea": milkTeaSetup,
+        "Peach Oolong Tea": peachOolongSetup
+    };
+
+    let drinkVarMap = {
+        "Milk Tea": "milkTea",
+        "Matcha Tea": "matchaDrink",
+        "Mango Grapefruit Green Tea": "mangoDrink",
+        "Grapefruit Green Tea": "grapefruitGreenTea",
+        "Passion Fruit Green Tea": "passionFruitDrink",
+        "Watermelon Smoothie": "watermelonSmoothie",
+        "Peach Oolong Tea": "peachOolong"
+    };
+
 if (screen === "start") {
 	abc();
 }
 function abc() {
-    grapefruitGreenTea = new Sprite(-150,40);
+    grapefruitGreenTea = new Sprite(-180,100);
     ggtDrinkSetup();
 
-    matchaDrink = new Sprite(-100,40);
+    matchaDrink = new Sprite(-120,100);
     mDrinkSetup();
 
-    mangoDrink = new Sprite(-50,40);
+    mangoDrink = new Sprite(-60,100);
     mangoDrinkSetup();
 
-    passionFruitDrink = new Sprite(0,40);
+    passionFruitDrink = new Sprite(0,100);
     passionFruitDrinkSetup();
 
-    watermelonSmoothie = new Sprite(50,40);
+    watermelonSmoothie = new Sprite(60,100);
     watermelonSmoothieSetup();
 
-    milkTea = new Sprite(100,40);
+    milkTea = new Sprite(120,100);
     milkTeaSetup();
 
-    peachOolong = new Sprite(150,40);
+    peachOolong = new Sprite(180,100);
     peachOolongSetup();
 
     q5.update = function() {
@@ -36,12 +82,34 @@ function abc() {
         fill("pink");
         textSize(32);
         textAlign(CENTER, CENTER);
-        text("Hey-T Game", 0, -40);
-        text("Click anywhere to begin", 0, 20);
+        text("Hey-T Game", 0, -60);
+
+        textSize(25);
+        text("CLICK anywhere to begin", 0, 20);
     };
 
-	document.getElementById("body").addEventListener("click", playScreen);
+	document.getElementById("body").addEventListener("click", directions);
 };
+
+function directions(){
+    document.getElementById("body").removeEventListener("click", directions);
+    q5.update = function(){
+        background("white");
+        fill("pink");
+        textSize(28);
+        textAlign(CENTER, CENTER);
+        text("DIRECTIONS", 0, -220);
+        
+        textSize(18);
+        text("Use the ARROW or WASD keys to move the player around the maze.", 0, -170);
+        text("Avoid The Big H and his duck! If they catch you, game over!", 0, -130);
+        text("Make as many drinks as you can for Hey-T! There are 7 recipes total.", 0, -90);
+        text("Press the R key to restart the game.", 0, -50);
+        text("But be careful: you will go back to having 0 drinks completed.", 0, -30);
+        text("CLICK again to begin the game!", 0, 30);
+    };
+    document.getElementById("body").addEventListener("click", playScreen);
+}
 
 let recipes = { // like a dictionary
     "Milk Tea": ["milk", "black"], // every string before comma = key
@@ -55,6 +123,7 @@ let recipes = { // like a dictionary
 
 let recipeNames = Object.keys(recipes); // each key gives us a list to use
 let currentDrink = "";
+let currentDrinkSprite1, currentDrinkSprite2;
 let neededIngredients = [];
 
 let completedDrinks = [];
@@ -91,7 +160,10 @@ function nextRound() {
     
     // if no drinks left, you win!
     if (remaining.length === 0) {
-        gameOver = true;
+        congratulations = true;
+        
+        backgroundMusic.stop();
+        victoryMusic.play();
 
         // YEET!
         player.x = 9999;
@@ -117,72 +189,78 @@ function nextRound() {
     neededIngredients = recipes[currentDrink];
     console.log("Make: " + currentDrink, "Need: " + neededIngredients);
 
-    // map ingredient names to their setup functions
-    let setupFunctions = {
-        "watermelon": watermelonSetup,
-        "mango": mangoSetup,
-        "peach": peachSetup,
-        "milk": milkSetup,
-        "grapefruit": grapeFruitSetup,
-        "passion": passionSetup,
-        "oolong": oolongSetup,
-        "matcha": matchaSetup,
-        "black": blackSetup,
-        "green": greenSetup,
-        "grapefruitGreenTea": ggtDrinkSetup,
-        "matchaDrink": mDrinkSetup,
-        "mangoDrink": mangoDrinkSetup,
-        "passionFruitDrink": passionFruitDrinkSetup,
-        "watermelonSmoothie": watermelonSmoothieSetup,
-        "milkTea": milkTeaSetup,
-        "peachOolong": peachOolongSetup
-    };
-
     let positions = [{x: 100, y: -70}, {x: -620, y: -70}, {x: 500, y: -100}, {x: 500, y: 200}, {x: -60, y: 200}, {x: 250, y: -220}, {x: -200, y: 150}, {x: -200, y: 0}, {x: -250, y: -210}, {x: -520, y: 110}];
 
     // shuffles ingredient positions
     for (let i = positions.length - 1; i > 0; i--) {
-    let j = Math.floor(Math.random() * (i + 1));
-    let temp = positions[i];
-    positions[i] = positions[j];
-    positions[j] = temp;
+        let j = Math.floor(Math.random() * (i + 1));
+        let temp = positions[i];
+        positions[i] = positions[j];
+        positions[j] = temp;
     }
 
     // another dictionary except for ingredient positions
     for (let i = 0; i < neededIngredients.length; i++) {
-    let name = neededIngredients[i];
-    let pos = positions[i]; // grab the next shuffled position
-    let sprite = new Sprite(pos.x, pos.y);
-    
-    window[name] = sprite;
-    setupFunctions[name]();
-    
-    sprite.name = name;
-    ingredients.add(sprite);
+        let name = neededIngredients[i];
+        let pos = positions[i]; // grab the next shuffled position
+        let sprite = new Sprite(pos.x, pos.y);
+        
+        window[name] = sprite;
+        setupFunctions[name]();
+        
+        sprite.name = name;
+        ingredients.add(sprite);
     }
 }
 
 function playScreen() {
 	document.getElementById("body").removeEventListener("click", playScreen);
+    backgroundMusic.loop = true;
+    backgroundMusic.play();
 
     grapefruitGreenTea.x = 9999;
+    grapefruitGreenTea.physics = STATIC;
     matchaDrink.x = 9999;
+    matchaDrink.physics = STATIC;
     mangoDrink.x = 9999;
+    mangoDrink.physics = STATIC;
     passionFruitDrink.x = 9999;
+    passionFruitDrink.physics = STATIC;
     watermelonSmoothie.x = 9999;
+    watermelonSmoothie.physics = STATIC;
     milkTea.x = 9999;
+    milkTea.physics = STATIC;
     peachOolong.x = 9999;
+    peachOolong.physics = STATIC;
 
     nextRound();
 
-    player = new Sprite(0,20);
+    if (!player || player.x === 9999){
+    player = new Sprite(0, 20);
     playerSetup();
-    
-    evilGuy = new Sprite(-620, 220);
-    evilSetup();
+    } 
+    else{
+        player.x = 0;
+        player.y = 20;
+    }
 
-    duck = new Sprite(620, -220);
-    duckSetup();
+    if (!evilGuy || evilGuy.x === 9999){
+        evilGuy = new Sprite(-620, 220);
+        evilSetup();
+    } 
+    else{
+        evilGuy.x = -620;
+        evilGuy.y = 220;
+    }
+
+    if (!duck || duck.x === 9999){
+        duck = new Sprite(620, -220);
+        duckSetup();
+    }
+    else{
+        duck.x = 620;
+        duck.y = -220;
+    }
 
     walls = buildMazeFromGrid(mazeGrid);
 
@@ -192,28 +270,75 @@ function playScreen() {
             fill("pink");
             textSize(32);
             textAlign(CENTER, CENTER);
-            text("Game over! You have made " + completedDrinks.length + " drinks. There are " + (7 - completedDrinks.length) + " drinks left to make!", 0, 0);
+            text("Game over! You have made " + completedDrinks.length + " drinks.", 0, -110);
+            text("There are " + (7 - completedDrinks.length) + " drinks left to make!", 0, -70);
+            text("Reload this page to play the game again!", 0, 0);
             for (let i = ingredients.length - 1; i >= 0; i--) {
                 ingredients[i].x = 9999;
                 ingredients[i].y = 9999;
             }
             return;
         }
+
+        if (congratulations) {
+            background("white");
+            fill("pink");
+            textSize(32);
+            textAlign(CENTER, CENTER);
+            text("Congratulations! You have made all 7 drinks of Hey-T!", 0, -50);
+            text("Reload this page to play the game again!", 0, 0);
+
+            grapefruitGreenTea = new Sprite(-180,100);
+            ggtDrinkSetup();
+
+            matchaDrink = new Sprite(-120,100);
+            mDrinkSetup();
+
+            mangoDrink = new Sprite(-60,100);
+            mangoDrinkSetup();
+
+            passionFruitDrink = new Sprite(0,100);
+            passionFruitDrinkSetup();
+
+            watermelonSmoothie = new Sprite(60,100);
+            watermelonSmoothieSetup();
+
+            milkTea = new Sprite(120,100);
+            milkTeaSetup();
+
+            peachOolong = new Sprite(180,100);
+            peachOolongSetup();
+
+            for (let i = ingredients.length - 1; i >= 0; i--) {
+                ingredients[i].x = 9999;
+                ingredients[i].y = 9999;
+            }
+            return;
+            
+        }
+
+        if (kb.presses('r' || 'R')) {
+            restartGame();
+            return;
+        }
         
         background('skyblue');
+        imageMode(CENTER);
+        image(bgImage, 0, 0, 1500, 720);
 
         fill("black");
         textSize(18);
         textAlign(CENTER, CENTER);
         text("Make: " + currentDrink, 0, -320);
+        text("Drinks remaining: " + (7 - completedDrinks.length), 0, -300);
 
         player.vel.x = 0;
         player.vel.y = 0;
 
-        if (kb.pressing('left'))  player.vel.x = -3;
-        if (kb.pressing('right')) player.vel.x = 3;
-        if (kb.pressing('up'))    player.vel.y = -3;
-        if (kb.pressing('down'))  player.vel.y = 3;
+        if (kb.pressing('left') || kb.pressing('a'))  player.vel.x = -3;
+        if (kb.pressing('right') || kb.pressing('d')) player.vel.x = 3;
+        if (kb.pressing('up') || kb.pressing('w'))    player.vel.y = -3;
+        if (kb.pressing('down') || kb.pressing('s'))  player.vel.y = 3;
 
         player.collides(walls);
 
@@ -229,6 +354,30 @@ function playScreen() {
             evilGuy.speed = 0;
             duck.speed = 0;
             
+            let drinkSpriteMap = {
+                "Grapefruit Green Tea": grapefruitGreenTea,
+                "Matcha Tea": matchaDrink,
+                "Mango Grapefruit Green Tea": mangoDrink,
+                "Passion Fruit Green Tea": passionFruitDrink,
+                "Watermelon Smoothie": watermelonSmoothie,
+                "Milk Tea": milkTea,
+                "Peach Oolong Tea": peachOolong
+            };
+
+            let drinkPositions = [-180, -120, -60, 0, 60, 120, 180];
+            let drinkOrder = ["Grapefruit Green Tea", "Matcha Tea", "Mango Grapefruit Green Tea", "Passion Fruit Green Tea", "Watermelon Smoothie", "Milk Tea", "Peach Oolong Tea"];
+
+            for (let i = 0; i < drinkOrder.length; i++) {
+                let drinkName = drinkOrder[i];
+                if (completedDrinks.includes(drinkName)) {
+                    drinkSpriteMap[drinkName].x = drinkPositions[i];
+                    drinkSpriteMap[drinkName].y = 80;
+                }
+            }
+
+            backgroundMusic.stop();
+            deathSound.play();
+
             // hide all walls
             for (let i = walls.length - 1; i >= 0; i--) {
                 walls[i].x = 9999;
@@ -257,9 +406,12 @@ function playScreen() {
         evilGuy.overlaps(duck);
 
         player.overlaps(ingredients, function(p, ingredient){
+            if(!gameOver){
             ingredientsCollected.push(ingredient.name)
             ingredient.delete();
             console.log(ingredientsCollected);
+            collectSound.play();
+            }
         })
 
         let distance = dist(player.x, player.y, evilGuy.x, evilGuy.y);
@@ -307,8 +459,8 @@ function playerSetup(){
         'images/bobagirl_2.png',
     );
     player.ani.frameDelay = 10;
-    player.width = 40;
-    player.height = 90;
+    player.width = 24;
+    player.height = 40;
     player.scale = 0.4;
     player.physics = DYNAMIC;
     player.rotationLock = true;
@@ -319,7 +471,7 @@ function evilSetup(){
     evilGuy.addAni('images/hare.png', 2, '320x320');
     evilGuy.ani.frameDelay = 6;
     evilGuy.scale = 0.3;
-    evilGuy.width = 40;
+    evilGuy.width = 24;
     evilGuy.height = 40;
     evilGuy.physics = DYNAMIC;
     evilGuy.rotationLock = true;
@@ -330,7 +482,7 @@ function duckSetup(){
     duck.addAni('images/evilduck.png', 2, '256x256');
     duck.ani.frameDelay = 5;
     duck.scale = 0.4;
-    duck.width = 40;
+    duck.width = 24;
     duck.height = 40;
     duck.physics = DYNAMIC;
     duck.rotationLock = true;
@@ -452,7 +604,7 @@ function watermelonSetup(){
 function ggtDrinkSetup(){
     grapefruitGreenTea.addAni('images/grapefruit gt.png', 7, '256x256');
     grapefruitGreenTea.ani.frameDelay = 6;
-    grapefruitGreenTea.scale = 0.6;
+    grapefruitGreenTea.scale = 0.9;
     grapefruitGreenTea.width = 40;
     grapefruitGreenTea.height = 40;
 }
@@ -492,7 +644,7 @@ function watermelonSmoothieSetup(){
 function milkTeaSetup(){
     milkTea.addAni('images/milk_tea.png', 7, '256x256');
     milkTea.ani.frameDelay = 6;
-    milkTea.scale = 0.6;
+    milkTea.scale = 0.9;
     milkTea.width = 40;
     milkTea.height = 40;
 }
@@ -500,7 +652,7 @@ function milkTeaSetup(){
 function peachOolongSetup(){
     peachOolong.addAni('images/peach_oolong.png', 7, '256x256');
     peachOolong.ani.frameDelay = 6;
-    peachOolong.scale = 0.6;
+    peachOolong.scale = 0.9;
     peachOolong.width = 40;
     peachOolong.height = 40;
 }
@@ -543,27 +695,41 @@ let mazeGrid = [
     [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
 ];
 
-function restartShortcut(event){
-    if (event.key === "r"){
-        event.preventDefault();
-        player.delete();
-        evilGuy.delete();
-        duck.delete();
+function restartGame() {
+    gameOver = false;
+    completedDrinks = [];
+    ingredientsCollected = [];
+    neededIngredients = [];
+    currentDrink = "";
 
-        for (let i = ingredients.length - 1; i >= 0; i--) {
-            ingredients[i].x = 9999;
-            ingredients[i].y = 9999;
-        }
-
-        for (let i = walls.length - 1; i >= 0; i--) {
-            walls[i].x = 9999;
-            walls[i].y = 9999;
-            walls[i].width = 0;
-            walls[i].height = 0;
-        }
-        gameOver = false;
-        completedDrinks = [];
-        playScreen();
+    for (let i = ingredients.length - 1; i >= 0; i--) {
+        ingredients[i].x = 9999;
+        ingredients[i].y = 9999;
     }
+
+    player.x = 0;
+    player.y = 20;
+
+    evilGuy.x = -620;
+    evilGuy.y = 220;
+    evilGuy.speed = 0;
+
+    duck.x = 620;
+    duck.y = -220;
+    duck.speed = 0;
+
+    for (let i = walls.length - 1; i >= 0; i--) {
+        walls[i].width = CELL;
+        walls[i].height = CELL;
+    }
+
+    grapefruitGreenTea.x = 9999;
+    matchaDrink.x = 9999;
+    mangoDrink.x = 9999;
+    passionFruitDrink.x = 9999;
+    watermelonSmoothie.x = 9999;
+    milkTea.x = 9999;
+    peachOolong.x = 9999;
+
+    nextRound();
 }
-document.addEventListener("keydown", restartShortcut);
