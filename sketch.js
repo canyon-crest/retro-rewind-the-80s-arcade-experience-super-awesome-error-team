@@ -165,6 +165,27 @@ function nextRound() {
         backgroundMusic.stop();
         victoryMusic.play();
 
+        grapefruitGreenTea = new Sprite(-180,100);
+        ggtDrinkSetup();
+
+        matchaDrink = new Sprite(-120,100);
+        mDrinkSetup();
+
+        mangoDrink = new Sprite(-60,100);
+        mangoDrinkSetup();
+
+        passionFruitDrink = new Sprite(0,100);
+        passionFruitDrinkSetup();
+
+        watermelonSmoothie = new Sprite(60,100);
+        watermelonSmoothieSetup();
+
+        milkTea = new Sprite(120,100);
+        milkTeaSetup();
+
+        peachOolong = new Sprite(180,100);
+        peachOolongSetup();
+
         // YEET!
         player.x = 9999;
         player.y = 9999;
@@ -287,27 +308,6 @@ function playScreen() {
             textAlign(CENTER, CENTER);
             text("Congratulations! You have made all 7 drinks of Hey-T!", 0, -50);
             text("Reload this page to play the game again!", 0, 0);
-
-            grapefruitGreenTea = new Sprite(-180,100);
-            ggtDrinkSetup();
-
-            matchaDrink = new Sprite(-120,100);
-            mDrinkSetup();
-
-            mangoDrink = new Sprite(-60,100);
-            mangoDrinkSetup();
-
-            passionFruitDrink = new Sprite(0,100);
-            passionFruitDrinkSetup();
-
-            watermelonSmoothie = new Sprite(60,100);
-            watermelonSmoothieSetup();
-
-            milkTea = new Sprite(120,100);
-            milkTeaSetup();
-
-            peachOolong = new Sprite(180,100);
-            peachOolongSetup();
 
             for (let i = ingredients.length - 1; i >= 0; i--) {
                 ingredients[i].x = 9999;
