@@ -19,6 +19,8 @@ deathSound.volume = 0.4;
 let victoryMusic = loadSound('sounds/Milkshake.mp3')
 victoryMusic.volume = 0.3;
 
+let confettiSprites = [];
+
 let setupFunctions = {
         "watermelon": watermelonSetup,
         "mango": mangoSetup,
@@ -160,50 +162,68 @@ function nextRound() {
     
     // if no drinks left, you win!
     if (remaining.length === 0) {
-        congratulations = true;
+    congratulations = true;
+    
+    backgroundMusic.stop();
+    victoryMusic.play();
+
+    // YEET everything first
+    player.x = 9999;
+    player.y = 9999;
+    evilGuy.x = 9999;
+    evilGuy.y = 9999;
+    duck.x = 9999;
+    duck.y = 9999;
+    evilGuy.speed = 0;
+    duck.speed = 0;
         
-        backgroundMusic.stop();
-        victoryMusic.play();
+    // hide all walls BEFORE creating confetti
+    for (let i = walls.length - 1; i >= 0; i--) {
+        walls[i].x = 9999;
+        walls[i].y = 9999;
+        walls[i].width = 0;
+        walls[i].height = 0;
+    }
 
-        grapefruitGreenTea = new Sprite(-180,100);
-        ggtDrinkSetup();
+    // hide ingredients
+    for (let i = ingredients.length - 1; i >= 0; i--) {
+        ingredients[i].x = 9999;
+        ingredients[i].y = 9999;
+    }
 
-        matchaDrink = new Sprite(-120,100);
-        mDrinkSetup();
+    // move drink sprites back
+    grapefruitGreenTea.x = -180;
+    grapefruitGreenTea.y = 100;
+    matchaDrink.x = -120;
+    matchaDrink.y = 100;
+    mangoDrink.x = -60;
+    mangoDrink.y = 100;
+    passionFruitDrink.x = 0;
+    passionFruitDrink.y = 100;
+    watermelonSmoothie.x = 60;
+    watermelonSmoothie.y = 100;
+    milkTea.x = 120;
+    milkTea.y = 100;
+    peachOolong.x = 180;
+    peachOolong.y = 100;
 
-        mangoDrink = new Sprite(-60,100);
-        mangoDrinkSetup();
-
-        passionFruitDrink = new Sprite(0,100);
-        passionFruitDrinkSetup();
-
-        watermelonSmoothie = new Sprite(60,100);
-        watermelonSmoothieSetup();
-
-        milkTea = new Sprite(120,100);
-        milkTeaSetup();
-
-        peachOolong = new Sprite(180,100);
-        peachOolongSetup();
-
-        // YEET!
-        player.x = 9999;
-        player.y = 9999;
-        evilGuy.x = 9999;
-        evilGuy.y = 9999;
-        duck.x = 9999;
-        duck.y = 9999;
-        evilGuy.speed = 0;
-        duck.speed = 0;
-            
-        // hide all walls
-        for (let i = walls.length - 1; i >= 0; i--) {
-            walls[i].x = 9999;
-            walls[i].y = 9999;
-            walls[i].width = 0;
-            walls[i].height = 0;
-        }
-        return;
+    // NOW create confetti
+    let colors = ['pink', 'gold', 'cyan', 'lime', 'magenta', 'orange', 'yellow', 'violet'];
+    for (let i = 0; i < 50; i++) {
+        let sprite = new Sprite(
+            Math.random() * 1200 - 600,
+            Math.random() * -400 - 100
+        );
+        let size = Math.random() * 6 + 4;
+        sprite.width = size;
+        sprite.height = size;
+        sprite.color = colors[Math.floor(Math.random() * colors.length)];
+        sprite.vel.x = Math.random() * 6 - 3;
+        sprite.vel.y = Math.random() * 3 + 1;
+        sprite.physics = DYNAMIC;
+        confettiSprites.push(sprite);
+    }
+    return;
     }
 
     currentDrink = remaining[Math.floor(Math.random() * remaining.length)];
